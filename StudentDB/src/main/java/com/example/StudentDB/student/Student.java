@@ -13,18 +13,14 @@ public class Student {
             sequenceName = "sequence_sequence",
             allocationSize = 1
     )
-    @GeneratedValue(
-            strategy = GenerationType.IDENTITY,
-            generator = "student_sequence"
-    )
+   
     private Long id;
     private String name;
     private String email;
     private LocalDate dob;
     private int age;
 
-    public Student(Long studentId, String initialName, String mail) {
-    }
+
 
     public LocalDate getDob() {
         return dob;

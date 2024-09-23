@@ -21,6 +21,7 @@ import java.time.Month;
 import java.util.List;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -84,27 +85,29 @@ class StudentDbApplicationTests {
     @Test
     @DisplayName(value = "verifyTheUpdateStudentTest")
     public void testUpdateStudent() throws Exception {
+        // Create mock student
+        Long studentId = 12L;
+        String updatedName = "Mariam";
+        String updatedEmail = "mariam@gmail.com";
 
-        when(studentService.updateStudent(12L,"Mariam","mariam@gmail.com"));
+        // Ensure the student exists in the repository before updating
+        Student existingStudent = new Student(22L, "Jessica", "jessica@gmail.com", LocalDate.of(2000, 4, 5), 24);
+        when(studentRepository.findById(studentId)).thenReturn(Optional.of(existingStudent));
+        when(studentRepository.findStudentByEmail(updatedEmail)).thenReturn(Optional.empty());
 
-        // Mock data
-        Long studentId = 223L;
-        String name = "Lari";
-        String email = "lari@example.com";
-
-        when(studentRepository.findById(studentId)).thenReturn(Optional.of(new Student(studentId, "Initial Name", "initial@example.com")));
-        when(studentRepository.findStudentByEmail(email)).thenReturn(Optional.empty());
-
-
+        // Perform update operation via MockMvc
         mockMvc.perform(put("/api/v1/student/" + studentId)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"name\": \"" + name + "\", \"email\": \"" + email + "\"}")
-                )
-                .andExpect(status().isOk());
+                        .content("{\"name\": \"" + updatedName + "\", \"email\": \"" + updatedEmail + "\"}"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.name").value(updatedName))
+                .andExpect(jsonPath("$.email").value(updatedEmail));
 
     }
 
 }
+
 
 
 
